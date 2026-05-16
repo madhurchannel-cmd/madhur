@@ -165,7 +165,7 @@ header { display:flex;align-items:center;justify-content:space-between;padding:1
 .deck-item { background:var(--surface);border:1px solid var(--border); border-radius:var(--r-sm);padding:14px 16px; backdrop-filter:var(--blur-sm); display:flex;align-items:center;gap:14px; cursor:pointer;transition:all 0.22s; position:relative; -webkit-user-select:none; user-select:none; overflow:hidden; }
 .deck-item:hover{background:var(--surface2);border-color:var(--accent);transform:translateY(-1px);box-shadow:0 6px 24px rgba(0,0,0,0.25);}
 .deck-icon{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,rgba(91,143,255,0.22),rgba(167,139,250,0.22));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
-.deck-info{flex:1;min-width:0;padding-right:80px;} /* Prevent overlap with mobile actions */
+.deck-info{flex:1;min-width:0;padding-right:80px;}
 .deck-name{font-size:14px;font-weight:800;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .deck-meta{font-size:11px;color:var(--text2);}
 .deck-progress-bar{height:2px;background:rgba(255,255,255,0.08);border-radius:2px;margin-top:6px;overflow:hidden;width:80%;}
@@ -347,7 +347,7 @@ header { display:flex;align-items:center;justify-content:space-between;padding:1
 
 /* Mobile Cleanup */
 @media(max-width:768px){
-  .deck-actions { opacity:1; } /* Always show touch buttons */
+  .deck-actions { opacity:1; } 
   .deck-info { padding-right: 70px; }
   .history-delete-btn { opacity:1; }
 }
@@ -456,14 +456,14 @@ header { display:flex;align-items:center;justify-content:space-between;padding:1
     </div>
   </div>
   
-  <!-- TTS Settings for High Quality Apple Voices -->
+  <!-- TTS Settings -->
   <div class="settings-section">
     <div class="settings-section-label">Pronunciation Voice (TTS)</div>
     <select id="voice-select" class="modal-input" onchange="state.ttsVoice = this.value; save();" style="width: 100%; margin-bottom: 0;">
-       <option value="">System Default</option>
+       <!-- Populated by JS -->
     </select>
-    <div style="font-size:11px;color:var(--text3);margin-top:6px;line-height:1.4;">
-      Select an HD voice. To see premium voices on iPhone, download them first in iOS Settings > Accessibility > Spoken Content > Voices.
+    <div style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.5;">
+      <strong>Note on iOS Safari:</strong> Apple blocks Siri voices from being used on websites. Use the <strong>Cloud HD</strong> option for premium, internet-powered pronunciation.
     </div>
   </div>
 
@@ -509,7 +509,7 @@ header { display:flex;align-items:center;justify-content:space-between;padding:1
 // ============ STATE ============
 let state = {
   decks: [], folders: [], bin: [], history: [],
-  streak: 0, lastStudyDate: null, theme: 'dark', ttsVoice: '',
+  streak: 0, lastStudyDate: null, theme: 'dark', ttsVoice: 'google-cloud',
   currentDeck: null, currentIdx: 0, currentQueue: [], isFlipped: false,
   sessionStats: {easy:0,ok:0,hard:0}, lastRated: null,
   quizMode: 'multi', quizQueue: [], quizIdx: 0, quizScore: 0, quizAnswered: false,
@@ -517,6 +517,7 @@ let state = {
 };
 let currentHistoryFilter = 'all';
 let deckToMove = null;
+let currentCloudAudio = null;
 
 // ============ PERSIST ============
 function save() { try { localStorage.setItem('rp1_state', JSON.stringify(state)); } catch(e){} }
@@ -545,17 +546,21 @@ function closeSettings() {
 }
 
 function populateVoices() {
-  if(!window.speechSynthesis) return;
-  const voices = window.speechSynthesis.getVoices();
   const select = document.getElementById('voice-select');
   if(!select) return;
-  const current = state.ttsVoice;
-  select.innerHTML = '<option value="">System Default</option>';
+  const current = state.ttsVoice || 'google-cloud';
+  
+  // Always offer Cloud TTS first
+  select.innerHTML = `<option value="google-cloud" ${current === 'google-cloud' ? 'selected' : ''}>☁️ Cloud HD (Recommended)</option>`;
+  select.innerHTML += `<option value="system" ${current === 'system' ? 'selected' : ''}>📱 Local System Default</option>`;
+  
+  if(!window.speechSynthesis) return;
+  const voices = window.speechSynthesis.getVoices();
+  
   voices.filter(v => v.lang.startsWith('ru')).forEach(v => {
     const opt = document.createElement('option');
     opt.value = v.voiceURI;
-    // Show if it's a native/premium voice
-    opt.textContent = `${v.name} ${v.localService ? '(HD Local)' : ''}`;
+    opt.textContent = `🗣️ ${v.name} ${v.localService ? '(Local WebKit)' : ''}`;
     if(v.voiceURI === current) opt.selected = true;
     select.appendChild(opt);
   });
@@ -766,7 +771,7 @@ function renderStudyCard() {
         </div>
         <div class="card-face card-back">
           <div style="width:100%">
-            <button class="audio-btn" id="audio-btn" onclick="event.stopPropagation();speakRussian('${escAttr(s.ru_raw||s.ru)}')">🔊 Premium Pronunciation</button>
+            <button class="audio-btn" id="audio-btn" onclick="event.stopPropagation();speakRussian('${escAttr(s.ru_raw||s.ru)}')">🔊 Play Pronunciation</button>
             <div class="translation-block">
               <div class="translation-label">Translation</div>
               <div class="translation-text">${escHtml(s.en)}</div>
@@ -894,7 +899,7 @@ function renderQuizCard() {
 
   let questionHTML = ''; let answerHTML = '';
   if (mode === 'listen') {
-    questionHTML = `<div class="quiz-question-label">🔊 Listen & Choose</div><button class="audio-btn" style="margin:0 auto 16px" onclick="speakRussian('${escAttr(s.ru_raw||s.ru)}')">🔊 Play HD Audio</button><div style="font-size:13px;color:var(--text3)">What does this sentence mean?</div>`;
+    questionHTML = `<div class="quiz-question-label">🔊 Listen & Choose</div><button class="audio-btn" style="margin:0 auto 16px" onclick="speakRussian('${escAttr(s.ru_raw||s.ru)}')">🔊 Play Pronunciation</button><div style="font-size:13px;color:var(--text3)">What does this sentence mean?</div>`;
   } else if (mode === 'reverse') {
     questionHTML = `<div class="quiz-question-label">🔄 Translate to Russian</div><div class="quiz-question-text" style="font-size:clamp(18px,4vw,24px)">${escHtml(s.en)}</div>`;
   } else {
@@ -925,11 +930,7 @@ function renderQuizCard() {
 function checkChoice(btn, chosen, correct) {
   if (state.quizAnswered) return;
   state.quizAnswered = true;
-  document.querySelectorAll('.quiz-choice').forEach(b => {
-    b.disabled = true;
-    // For reverse mode, innerText has stress marks, but we pass raw as args, so we can just check against correct
-    // Easier way: just add classes based on click.
-  });
+  document.querySelectorAll('.quiz-choice').forEach(b => { b.disabled = true; });
   btn.classList.add(chosen === correct ? 'correct' : 'wrong');
   
   // Highlight correct one
@@ -1009,26 +1010,47 @@ function renderHistory(filter) {
 function filterHistory(filter, el) { document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active')); el.classList.add('active'); renderHistory(filter); }
 function deleteHistoryItem(idx) { state.history.splice(idx,1); save(); renderHistory(currentHistoryFilter); }
 
-// ============ TTS ============
+// ============ TTS (WITH CLOUD BYPASS) ============
 function speakRussian(text) {
-  if (!window.speechSynthesis) { showToast('TTS not supported'); return; }
-  // We keep stress marks by default for advanced native voices. If you ever find it bugging out basic voices, add .replace(/\u0301/g,'') here.
-  const clean = text;
+  // Cancel any currently playing audio
+  if (currentCloudAudio) { currentCloudAudio.pause(); currentCloudAudio = null; }
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
+  
+  // Remove accent/stress marks specifically so the TTS engine doesn't glitch and spell them out
+  const cleanForTTS = text.replace(/\u0301/g, ''); 
+  
   document.querySelectorAll('.audio-btn').forEach(btn => btn.classList.add('speaking'));
-  window.speechSynthesis.cancel();
-  const utt = new SpeechSynthesisUtterance(clean);
+  
+  // 1. Google Cloud Bypass (Free, Unofficial Endpoint, Insanely High Quality)
+  if (state.ttsVoice === 'google-cloud') {
+    const url = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=ru&q=${encodeURIComponent(cleanForTTS)}`;
+    currentCloudAudio = new Audio(url);
+    currentCloudAudio.onended = () => document.querySelectorAll('.audio-btn').forEach(btn => btn.classList.remove('speaking'));
+    currentCloudAudio.onerror = () => { showToast('Cloud Audio Failed. Need internet.'); document.querySelectorAll('.audio-btn').forEach(btn => btn.classList.remove('speaking')); };
+    currentCloudAudio.play().catch(e => {
+      // Browsers restrict auto-play without gesture. It usually works on click.
+      showToast('Audio blocked by Safari. Tap play again.');
+      document.querySelectorAll('.audio-btn').forEach(btn => btn.classList.remove('speaking'));
+    });
+    return;
+  }
+  
+  // 2. Standard Web Speech API (Local System Voices)
+  if (!window.speechSynthesis) { showToast('TTS not supported'); return; }
+  
+  const utt = new SpeechSynthesisUtterance(cleanForTTS);
   utt.lang='ru-RU'; utt.rate=0.85;
   const voices = window.speechSynthesis.getVoices();
   
-  if (state.ttsVoice) {
+  if (state.ttsVoice && state.ttsVoice !== 'system') {
     const selected = voices.find(v => v.voiceURI === state.ttsVoice);
     if (selected) utt.voice = selected;
   } else {
-    const ruVoice = voices.find(v=>v.lang.startsWith('ru'));
+    const ruVoice = voices.find(v => v.lang.startsWith('ru'));
     if (ruVoice) utt.voice = ruVoice;
   }
   
-  utt.onend = () => { document.querySelectorAll('.audio-btn').forEach(btn => btn.classList.remove('speaking')); };
+  utt.onend = () => document.querySelectorAll('.audio-btn').forEach(btn => btn.classList.remove('speaking'));
   window.speechSynthesis.speak(utt);
 }
 
