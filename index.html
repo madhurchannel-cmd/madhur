@@ -12,7 +12,7 @@
   --border: rgba(255,255,255,0.11); --border2: rgba(255,255,255,0.18); --accent: #5b8fff; --accent2: #a78bfa; --accent3: #34d399;
   --red: #f87171; --yellow: #fbbf24; --text: #f0f0f8; --text2: rgba(240,240,248,0.5); --text3: rgba(240,240,248,0.28);
   --blur: blur(30px) saturate(180%); --blur-sm: blur(16px) saturate(160%);
-  --r: 28px; --r-sm: 18px; /* Squircles */
+  --r: 28px; --r-sm: 18px;
   --shadow: 0 8px 40px rgba(0,0,0,0.55), 0 1px 0 rgba(255,255,255,0.07) inset;
   --shadow-lg: 0 24px 70px rgba(0,0,0,0.7), 0 1px 0 rgba(255,255,255,0.1) inset;
   --orb-opacity: 0.16; --grain-opacity: 0.4;
@@ -217,10 +217,11 @@ header { display:flex;align-items:center;justify-content:space-between;padding:1
 .grammar-note{margin-top:14px;padding:12px 14px;background:rgba(167,139,250,0.07);border:1px solid rgba(167,139,250,0.15);border-radius:14px;font-size:12px;color:var(--text2);line-height:1.65;width:100%;}
 .grammar-note strong{color:var(--accent2);}
 
-.audio-btn{background:var(--surface);border:1px solid var(--border);border-radius:100px;padding:7px 18px 7px 12px;color:var(--text2);font-family:'Manrope',sans-serif;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:all 0.2s;margin-bottom:18px;}
+/* Custom Audio Tools */
+.audio-btn{background:var(--surface);border:1px solid var(--border);border-radius:100px;padding:7px 18px 7px 12px;color:var(--text2);font-family:'Manrope',sans-serif;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:all 0.2s;}
 .audio-btn:hover{background:var(--surface2);color:var(--text);}
-.audio-btn.speaking{color:var(--accent);border-color:rgba(91,143,255,0.35);}
 .front-audio{margin-top:14px;padding:12px;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:0;}
+.card-tools { display: flex; gap: 8px; justify-content: flex-start; margin-bottom: 18px; flex-wrap: wrap; width: 100%; }
 
 .flip-hint{text-align:center;font-size:11px;color:var(--text3);margin-bottom:18px;display:flex;align-items:center;justify-content:center;gap:6px;}
 
@@ -339,7 +340,8 @@ header { display:flex;align-items:center;justify-content:space-between;padding:1
 /* ============ MISC ============ */
 .empty{text-align:center;padding:55px 20px;color:var(--text3);font-size:14px;line-height:2;}
 .empty-icon{font-size:40px;margin-bottom:12px;}
-.glass-btn{padding:10px 20px;border:1px solid var(--border);border-radius:100px;background:var(--surface);color:var(--text2);font-family:'Manrope',sans-serif;font-size:12px;font-weight:700;cursor:pointer;backdrop-filter:var(--blur-sm);}
+.glass-btn{padding:10px 16px;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text2);font-family:'Manrope',sans-serif;font-size:12px;font-weight:700;cursor:pointer;backdrop-filter:var(--blur-sm);transition:all 0.2s;}
+.glass-btn:hover{background:var(--surface2);color:var(--text);}
 .particle{position:fixed;pointer-events:none;z-index:999;font-size:20px;animation:particle-float 0.9s ease-out forwards;}
 @keyframes particle-float{0%{opacity:1;transform:translateY(0) scale(1);}100%{opacity:0;transform:translateY(-70px) scale(0.4);}}
 .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface2);border:1px solid var(--border);backdrop-filter:var(--blur);padding:12px 24px;border-radius:100px;font-size:13px;font-weight:700;color:var(--text);opacity:0;transition:all 0.32s cubic-bezier(0.4,0,0.2,1);z-index:300;pointer-events:none;white-space:nowrap;}
@@ -402,7 +404,7 @@ header { display:flex;align-items:center;justify-content:space-between;padding:1
     </div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;margin-top:4px;">
       <div class="section-label" style="margin:0;">YOUR LIBRARY</div>
-      <button class="glass-btn" onclick="openFolderModal()">+ New Folder</button>
+      <button class="glass-btn" style="border-radius:100px" onclick="openFolderModal()">+ New Folder</button>
     </div>
     <div id="deck-library"></div>
   </div>
@@ -455,17 +457,6 @@ header { display:flex;align-items:center;justify-content:space-between;padding:1
       <div class="theme-btn" onclick="setTheme('aurora')" data-t="aurora"><div class="theme-swatch" style="background:linear-gradient(135deg,#00ffcc,#0088ff);box-shadow:0 0 8px #00ffcc"></div>Aurora</div>
     </div>
   </div>
-  
-  <!-- TTS Settings -->
-  <div class="settings-section">
-    <div class="settings-section-label">Pronunciation Voice (TTS)</div>
-    <select id="voice-select" class="modal-input" onchange="state.ttsVoice = this.value; save();" style="width: 100%; margin-bottom: 0;">
-       <!-- Populated by JS -->
-    </select>
-    <div style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.5;">
-      <strong>Note on iOS Safari:</strong> Apple blocks Siri voices from being used on websites. Use the <strong>Cloud HD</strong> option for premium, internet-powered pronunciation.
-    </div>
-  </div>
 
   <div class="settings-section">
     <div class="settings-section-label">Data Management</div>
@@ -473,6 +464,10 @@ header { display:flex;align-items:center;justify-content:space-between;padding:1
     <button class="settings-action-btn" onclick="document.getElementById('backup-file-input').click()">📂 Restore from Backup</button>
     <input type="file" id="backup-file-input" accept=".json" onchange="importBackup(event)" style="display:none;">
     <button class="settings-action-btn danger" onclick="confirmClearAll()">🗑 Clear All Data</button>
+    
+    <div style="font-size:11px;color:var(--text3);margin-top:12px;line-height:1.5;background:rgba(255,255,255,0.05);padding:10px;border-radius:12px;border:1px solid var(--border);">
+      <strong>Storage Note:</strong> Audio files uploaded to cards are securely saved inside your browser's IndexedDB to preserve data caps. They are <strong>not</strong> included in JSON backups to keep file sizes small.
+    </div>
   </div>
 </div>
 
@@ -506,25 +501,67 @@ header { display:flex;align-items:center;justify-content:space-between;padding:1
 <div class="toast" id="toast"></div>
 
 <script>
+// ============ INDEXEDDB AUDIO STORAGE ============
+const dbName = "RP1_AudioDB";
+let audioDB;
+
+function initAudioDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(dbName, 1);
+    req.onupgradeneeded = (e) => { e.target.result.createObjectStore("audio", { keyPath: "id" }); };
+    req.onsuccess = (e) => { audioDB = e.target.result; resolve(); };
+    req.onerror = (e) => reject(e);
+  });
+}
+function saveAudioToDB(id, fileBlob) {
+  return new Promise((resolve) => {
+    const tx = audioDB.transaction("audio", "readwrite");
+    tx.objectStore("audio").put({ id, blob: fileBlob });
+    tx.oncomplete = () => resolve();
+  });
+}
+function getAudioFromDB(id) {
+  return new Promise((resolve) => {
+    const tx = audioDB.transaction("audio", "readonly");
+    const req = tx.objectStore("audio").get(id);
+    req.onsuccess = () => resolve(req.result ? req.result.blob : null);
+    req.onerror = () => resolve(null);
+  });
+}
+function deleteAudioFromDB(id) {
+  return new Promise((resolve) => {
+    const tx = audioDB.transaction("audio", "readwrite");
+    tx.objectStore("audio").delete(id);
+    tx.oncomplete = () => resolve();
+  });
+}
+
+const globalAudioPlayer = new Audio();
+
 // ============ STATE ============
 let state = {
   decks: [], folders: [], bin: [], history: [],
-  streak: 0, lastStudyDate: null, theme: 'dark', ttsVoice: 'google-cloud',
+  streak: 0, lastStudyDate: null, theme: 'dark',
   currentDeck: null, currentIdx: 0, currentQueue: [], isFlipped: false,
   sessionStats: {easy:0,ok:0,hard:0}, lastRated: null,
   quizMode: 'multi', quizQueue: [], quizIdx: 0, quizScore: 0, quizAnswered: false,
-  selectedFolderEmoji: '📁', editingFolderId: null
+  selectedFolderEmoji: '📁', editingFolderId: null,
+  hasAudio: {} // Maps sentence ID to boolean for instant UI rendering
 };
 let currentHistoryFilter = 'all';
 let deckToMove = null;
-let currentCloudAudio = null;
 
 // ============ PERSIST ============
 function save() { try { localStorage.setItem('rp1_state', JSON.stringify(state)); } catch(e){} }
-function load() {
-  try { const d = localStorage.getItem('rp1_state'); if (d) { const p = JSON.parse(d); state = {...state,...p}; }
+async function load() {
+  try { 
+    const d = localStorage.getItem('rp1_state'); 
+    if (d) { const p = JSON.parse(d); state = {...state,...p}; if(!state.hasAudio) state.hasAudio = {}; }
     applyTheme(state.theme || 'dark'); updateStreakDisplay();
   } catch(e){}
+  
+  try { await initAudioDB(); } 
+  catch(e) { console.error("Could not init IndexedDB", e); }
 }
 
 // ============ THEME ============
@@ -534,38 +571,16 @@ function applyTheme(t) {
   document.querySelectorAll('.theme-btn').forEach(b => b.classList.toggle('active', b.dataset.t === t));
 }
 
-// ============ SETTINGS & TTS VOICES ============
+// ============ SETTINGS ============
 function openSettings() {
   document.getElementById('settings-overlay').classList.add('open');
   document.getElementById('settings-panel').classList.add('open');
-  applyTheme(state.theme); populateVoices();
+  applyTheme(state.theme);
 }
 function closeSettings() {
   document.getElementById('settings-overlay').classList.remove('open');
   document.getElementById('settings-panel').classList.remove('open');
 }
-
-function populateVoices() {
-  const select = document.getElementById('voice-select');
-  if(!select) return;
-  const current = state.ttsVoice || 'google-cloud';
-  
-  // Always offer Cloud TTS first
-  select.innerHTML = `<option value="google-cloud" ${current === 'google-cloud' ? 'selected' : ''}>☁️ Cloud HD (Recommended)</option>`;
-  select.innerHTML += `<option value="system" ${current === 'system' ? 'selected' : ''}>📱 Local System Default</option>`;
-  
-  if(!window.speechSynthesis) return;
-  const voices = window.speechSynthesis.getVoices();
-  
-  voices.filter(v => v.lang.startsWith('ru')).forEach(v => {
-    const opt = document.createElement('option');
-    opt.value = v.voiceURI;
-    opt.textContent = `🗣️ ${v.name} ${v.localService ? '(Local WebKit)' : ''}`;
-    if(v.voiceURI === current) opt.selected = true;
-    select.appendChild(opt);
-  });
-}
-if(window.speechSynthesis) window.speechSynthesis.onvoiceschanged = populateVoices;
 
 // ============ STREAK ============
 function updateStreakDisplay() { document.getElementById('streak-count').textContent = state.streak; }
@@ -728,6 +743,62 @@ function restoreFromBin(i) { state.decks.push(state.bin[i].data); state.bin.spli
 function permanentDelete(i) { state.bin.splice(i,1); save(); renderBin(); }
 function emptyBin() { state.bin = []; save(); renderBin(); showToast('Bin emptied'); }
 
+// ============ CUSTOM AUDIO FUNCS ============
+function getAudioId(sentenceObj) {
+  return sentenceObj.ru_raw || sentenceObj.ru;
+}
+
+async function handleAudioUpload(e, audioId) {
+  const file = e.target.files[0];
+  if (!file) return;
+  try {
+    await saveAudioToDB(audioId, file);
+    state.hasAudio[audioId] = true;
+    save();
+    renderStudyCard(); // Re-render to show play button
+    showToast('Audio saved locally!');
+  } catch (err) { showToast('Error saving audio'); }
+}
+
+async function removeAudio(audioId) {
+  if(!confirm("Remove custom audio for this card?")) return;
+  try {
+    await deleteAudioFromDB(audioId);
+    delete state.hasAudio[audioId];
+    save();
+    renderStudyCard();
+    showToast('Audio removed');
+  } catch (err) { showToast('Error removing audio'); }
+}
+
+async function playUploadedAudio(audioId) {
+  try {
+    const blob = await getAudioFromDB(audioId);
+    if (!blob) return showToast('Audio not found in database');
+    
+    globalAudioPlayer.pause();
+    if (globalAudioPlayer.src) URL.revokeObjectURL(globalAudioPlayer.src);
+    
+    globalAudioPlayer.src = URL.createObjectURL(blob);
+    globalAudioPlayer.play().catch(e => showToast("Couldn't play audio"));
+  } catch(e) { showToast("Error loading audio"); }
+}
+
+function copyCardText(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('Text copied!');
+  }).catch(err => {
+    // Fallback for iOS Safari sometimes
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand("copy");
+    textArea.remove();
+    showToast('Text copied!');
+  });
+}
+
 // ============ STUDY CARD ============
 function startDeck(deckIdx) {
   state.currentDeck = deckIdx; state.sessionStats = {easy:0,ok:0,hard:0};
@@ -750,6 +821,9 @@ function renderStudyCard() {
   if (state.currentIdx >= state.currentQueue.length) { renderDoneCard(); return; }
   const sentIdx = state.currentQueue[state.currentIdx]; const s = deck.sentences[sentIdx];
   const pct = Math.round(state.currentIdx/state.currentQueue.length*100);
+  
+  const audioId = getAudioId(s);
+  const hasAudio = state.hasAudio[audioId];
 
   sc.innerHTML = `
     <div class="study-header">
@@ -766,16 +840,25 @@ function renderStudyCard() {
         <div class="card-face card-front">
           <div class="card-tag">🇷🇺 Russian</div>
           <div class="russian-sentence">${formatStress(s.ru)}</div>
-          <button class="audio-btn front-audio" onclick="event.stopPropagation();speakRussian('${escAttr(s.ru_raw||s.ru)}')">🔊</button>
+          ${hasAudio ? `<button class="audio-btn front-audio" onclick="event.stopPropagation();playUploadedAudio('${escAttr(audioId)}')">🔊</button>` : ''}
           <div class="card-hint">tap card to reveal</div>
         </div>
         <div class="card-face card-back">
           <div style="width:100%">
-            <button class="audio-btn" id="audio-btn" onclick="event.stopPropagation();speakRussian('${escAttr(s.ru_raw||s.ru)}')">🔊 Play Pronunciation</button>
+            
             <div class="translation-block">
               <div class="translation-label">Translation</div>
               <div class="translation-text">${escHtml(s.en)}</div>
             </div>
+            
+            <div class="card-tools" onclick="event.stopPropagation()">
+              <button class="glass-btn" onclick="copyCardText('${escAttr(s.ru)}')">📋 Copy</button>
+              <input type="file" id="file-audio-${sentIdx}" accept="audio/*" style="display:none" onchange="handleAudioUpload(event, '${escAttr(audioId)}')">
+              <button class="glass-btn" onclick="document.getElementById('file-audio-${sentIdx}').click()">${hasAudio ? '🔄 Replace Audio' : '⬆️ Add Audio'}</button>
+              ${hasAudio ? `<button class="glass-btn" onclick="playUploadedAudio('${escAttr(audioId)}')">🔊 Play</button>` : ''}
+              ${hasAudio ? `<button class="glass-btn" onclick="removeAudio('${escAttr(audioId)}')">🗑️</button>` : ''}
+            </div>
+
             ${s.words&&s.words.length?`<div class="breakdown-block"><div class="breakdown-title">Word Breakdown</div><div class="word-chips">${s.words.map(w=>`<div class="word-chip"><span class="chip-ru">${formatStress(w.ru)}</span><span class="chip-en">${escHtml(w.en)}</span><span class="chip-pos">${escHtml(w.pos||'')}</span></div>`).join('')}</div></div>`:''}
             ${s.grammar?`<div class="grammar-note">📌 <strong>Note:</strong> ${escHtml(s.grammar)}</div>`:''}
           </div>
@@ -871,16 +954,24 @@ function startQuizFlow() {
   const sel = document.getElementById('quiz-deck-select');
   if (sel && sel.value !== 'all') { startQuizFromDeck(parseInt(sel.value)); } 
   else {
-    const all = state.decks.flatMap(d => d.sentences.map(s => ({...s, deckName:d.name, deckEmoji:d.emoji})));
-    if (all.length < 4) { showToast('Need at least 4 sentences total to quiz'); return; }
+    let all = state.decks.flatMap(d => d.sentences.map(s => ({...s, deckName:d.name, deckEmoji:d.emoji})));
+    
+    // If listening quiz, filter to only cards with audio uploaded
+    if(state.quizMode === 'listen') { all = all.filter(s => state.hasAudio[getAudioId(s)]); }
+    
+    if (all.length < 4) { showToast(state.quizMode === 'listen' ? 'Need at least 4 cards with audio uploaded!' : 'Need at least 4 sentences total to quiz'); return; }
     state.quizQueue = shuffle([...all]).slice(0, Math.min(20, all.length));
     state.quizIdx = 0; state.quizScore = 0; state.quizAnswered = false; renderQuizCard();
   }
 }
+
 function startQuizFromDeck(deckIdx) {
   const deck = state.decks[deckIdx];
-  const all = deck.sentences.map(s => ({...s, deckName:deck.name, deckEmoji:deck.emoji}));
-  if (all.length < 4) { showToast('Need at least 4 sentences in this deck'); return; }
+  let all = deck.sentences.map(s => ({...s, deckName:deck.name, deckEmoji:deck.emoji}));
+  
+  if(state.quizMode === 'listen') { all = all.filter(s => state.hasAudio[getAudioId(s)]); }
+  
+  if (all.length < 4) { showToast(state.quizMode === 'listen' ? 'Need at least 4 cards with audio uploaded!' : 'Need at least 4 sentences in this deck'); return; }
   state.quizQueue = shuffle(all).slice(0, Math.min(20, all.length));
   state.quizIdx = 0; state.quizScore = 0; state.quizAnswered = false; renderQuizCard();
 }
@@ -891,6 +982,9 @@ function renderQuizCard() {
   const s = state.quizQueue[state.quizIdx]; const mode = state.quizMode; const total = state.quizQueue.length;
   const pct = Math.round(state.quizIdx/total*100);
   
+  const audioId = getAudioId(s);
+  const hasAudio = state.hasAudio[audioId];
+  
   // Bulletproof generation of wrong answers
   const allSentences = state.decks.flatMap(d=>d.sentences);
   let others = shuffle(allSentences.filter(x=>(x.ru_raw||x.ru)!==(s.ru_raw||s.ru))).slice(0,3);
@@ -899,11 +993,12 @@ function renderQuizCard() {
 
   let questionHTML = ''; let answerHTML = '';
   if (mode === 'listen') {
-    questionHTML = `<div class="quiz-question-label">🔊 Listen & Choose</div><button class="audio-btn" style="margin:0 auto 16px" onclick="speakRussian('${escAttr(s.ru_raw||s.ru)}')">🔊 Play Pronunciation</button><div style="font-size:13px;color:var(--text3)">What does this sentence mean?</div>`;
+    questionHTML = `<div class="quiz-question-label">🔊 Listen & Choose</div><button class="audio-btn" style="margin:0 auto 16px" onclick="playUploadedAudio('${escAttr(audioId)}')">🔊 Play Audio</button><div style="font-size:13px;color:var(--text3)">What does this sentence mean?</div>`;
   } else if (mode === 'reverse') {
     questionHTML = `<div class="quiz-question-label">🔄 Translate to Russian</div><div class="quiz-question-text" style="font-size:clamp(18px,4vw,24px)">${escHtml(s.en)}</div>`;
   } else {
-    questionHTML = `<div class="quiz-question-label">🇷🇺 What does this mean?</div><div class="quiz-question-text">${formatStress(s.ru)}</div>`;
+    questionHTML = `<div class="quiz-question-label">🇷🇺 What does this mean?</div><div class="quiz-question-text">${formatStress(s.ru)}</div>
+                    ${hasAudio ? `<button class="audio-btn" style="margin:16px auto 0" onclick="playUploadedAudio('${escAttr(audioId)}')">🔊</button>` : ''}`;
   }
 
   if (mode === 'typein') {
@@ -922,7 +1017,7 @@ function renderQuizCard() {
     <div id="quiz-feedback" style="display:none"></div>
     <div id="quiz-next" style="display:none;margin-top:12px"><button class="quiz-next-btn" onclick="nextQuiz()">Next Question ⏎</button></div>
   `;
-  if (mode === 'listen') setTimeout(() => speakRussian(s.ru_raw||s.ru), 300);
+  if (mode === 'listen' && hasAudio) setTimeout(() => playUploadedAudio(audioId), 300);
   if (mode === 'typein') { setTimeout(() => document.getElementById('quiz-input').focus(), 100); }
   state.quizAnswered = false;
 }
@@ -988,7 +1083,7 @@ function renderQuizDone() {
       <div class="done-sub">${state.quizScore} / ${total} correct</div>
       <div style="margin-bottom:24px"><div class="progress-bar-outer" style="margin:0"><div class="progress-bar-inner" style="width:${pct}%"></div></div></div>
       <button class="restart-btn" onclick="startQuizFlow()">Quiz Again</button>
-      <button class="glass-btn" onclick="renderQuizIntro()">Menu</button>
+      <button class="glass-btn" style="border-radius:100px;" onclick="renderQuizIntro()">Menu</button>
     </div>
   `;
   state.quizQueue = [];
@@ -1009,50 +1104,6 @@ function renderHistory(filter) {
 }
 function filterHistory(filter, el) { document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active')); el.classList.add('active'); renderHistory(filter); }
 function deleteHistoryItem(idx) { state.history.splice(idx,1); save(); renderHistory(currentHistoryFilter); }
-
-// ============ TTS (WITH CLOUD BYPASS) ============
-function speakRussian(text) {
-  // Cancel any currently playing audio
-  if (currentCloudAudio) { currentCloudAudio.pause(); currentCloudAudio = null; }
-  if (window.speechSynthesis) window.speechSynthesis.cancel();
-  
-  // Remove accent/stress marks specifically so the TTS engine doesn't glitch and spell them out
-  const cleanForTTS = text.replace(/\u0301/g, ''); 
-  
-  document.querySelectorAll('.audio-btn').forEach(btn => btn.classList.add('speaking'));
-  
-  // 1. Google Cloud Bypass (Free, Unofficial Endpoint, Insanely High Quality)
-  if (state.ttsVoice === 'google-cloud') {
-    const url = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=ru&q=${encodeURIComponent(cleanForTTS)}`;
-    currentCloudAudio = new Audio(url);
-    currentCloudAudio.onended = () => document.querySelectorAll('.audio-btn').forEach(btn => btn.classList.remove('speaking'));
-    currentCloudAudio.onerror = () => { showToast('Cloud Audio Failed. Need internet.'); document.querySelectorAll('.audio-btn').forEach(btn => btn.classList.remove('speaking')); };
-    currentCloudAudio.play().catch(e => {
-      // Browsers restrict auto-play without gesture. It usually works on click.
-      showToast('Audio blocked by Safari. Tap play again.');
-      document.querySelectorAll('.audio-btn').forEach(btn => btn.classList.remove('speaking'));
-    });
-    return;
-  }
-  
-  // 2. Standard Web Speech API (Local System Voices)
-  if (!window.speechSynthesis) { showToast('TTS not supported'); return; }
-  
-  const utt = new SpeechSynthesisUtterance(cleanForTTS);
-  utt.lang='ru-RU'; utt.rate=0.85;
-  const voices = window.speechSynthesis.getVoices();
-  
-  if (state.ttsVoice && state.ttsVoice !== 'system') {
-    const selected = voices.find(v => v.voiceURI === state.ttsVoice);
-    if (selected) utt.voice = selected;
-  } else {
-    const ruVoice = voices.find(v => v.lang.startsWith('ru'));
-    if (ruVoice) utt.voice = ruVoice;
-  }
-  
-  utt.onend = () => document.querySelectorAll('.audio-btn').forEach(btn => btn.classList.remove('speaking'));
-  window.speechSynthesis.speak(utt);
-}
 
 // ============ BACKUP ============
 function exportBackup() {
@@ -1087,7 +1138,9 @@ function spawnParticle(emoji) {
 }
 
 // ============ INIT ============
-load(); renderDecks(); renderQuizIntro();
+load().then(() => {
+  renderDecks(); renderQuizIntro();
+});
 </script>
 </body>
 </html>
