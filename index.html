@@ -788,7 +788,6 @@ function copyCardText(text) {
   navigator.clipboard.writeText(text).then(() => {
     showToast('Text copied!');
   }).catch(err => {
-    // Fallback for iOS Safari sometimes
     const textArea = document.createElement("textarea");
     textArea.value = text;
     document.body.appendChild(textArea);
@@ -853,7 +852,7 @@ function renderStudyCard() {
             
             <div class="card-tools" onclick="event.stopPropagation()">
               <button class="glass-btn" onclick="copyCardText('${escAttr(s.ru)}')">📋 Copy</button>
-              <input type="file" id="file-audio-${sentIdx}" accept="audio/*" style="display:none" onchange="handleAudioUpload(event, '${escAttr(audioId)}')">
+              <input type="file" id="file-audio-${sentIdx}" accept=".mp3,.wav,.m4a,.aac,.ogg,audio/*,video/mp4,video/x-m4v" style="display:none" onchange="handleAudioUpload(event, '${escAttr(audioId)}')">
               <button class="glass-btn" onclick="document.getElementById('file-audio-${sentIdx}').click()">${hasAudio ? '🔄 Replace Audio' : '⬆️ Add Audio'}</button>
               ${hasAudio ? `<button class="glass-btn" onclick="playUploadedAudio('${escAttr(audioId)}')">🔊 Play</button>` : ''}
               ${hasAudio ? `<button class="glass-btn" onclick="removeAudio('${escAttr(audioId)}')">🗑️</button>` : ''}
